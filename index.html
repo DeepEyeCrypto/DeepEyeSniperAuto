@@ -161,24 +161,78 @@
 
         /* GLASS PANELS */
         .glass-panel {
-            background: var(--glass-bg);
+            background: rgba(2, 3, 4, 0.4);
             backdrop-filter: var(--glass-blur);
             border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* NEON GREEN GLOW OVERRIDE */
+        .neon-border {
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.05);
+        }
+
+        .neon-border:hover {
+            border-color: rgba(0, 255, 65, 0.5);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.15);
+        }
+
+        .hft-green-glow {
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            color: var(--neon-green);
         }
 
         .app-layout {
-            display: grid;
-            grid-template-columns: calc(var(--sidebar-w) + 20px) 1fr var(--right-panel-w);
-            grid-template-rows: 100%;
+            display: flex;
+            flex-direction: row;
             height: 100vh;
             width: 100vw;
             padding: var(--app-padding);
             gap: var(--app-gap);
             box-sizing: border-box;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* DRAWER SIDEBAR (SYSTEM CONFIG) */
+        #settings-modal {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            width: 380px;
+            height: 100vh;
+            background: rgba(2, 3, 4, 0.95);
+            backdrop-filter: blur(40px);
+            border-right: 1px solid var(--neon-green);
+            z-index: 3000;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 20px 0 80px rgba(0, 255, 65, 0.1);
+        }
+
+        #settings-modal.drawer-open {
+            left: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         @media (max-width: 768px) {
@@ -221,13 +275,14 @@
 
         /* WIDGET SPECIFIC STYLING */
         .widget-card {
-            padding: clamp(8px, 1.2vw, 20px);
+            padding: clamp(10px, 1.5vw, 24px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            min-height: 110px;
+            min-height: 120px;
+            border-radius: 24px;
         }
 
         .widget-rsi {
@@ -432,6 +487,7 @@
     <body>
         <div id="crt-layer" class="crt-overlay crt-active"></div>
         <div class="scanline"></div>
+        <div id="settings-overlay" class="drawer-overlay" onclick="toggleSettings()"></div>
 
         <!-- FLOATING PILL SIDEBAR -->
         <nav id="main-sidebar">
@@ -485,12 +541,11 @@
                 </button>
             </div>
 
-            <!-- SETTINGS MODAL -->
-            <div id="settings-modal"
-                class="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] hidden flex items-center justify-center">
-                <div class="glass-panel p-6 w-[90%] max-w-md space-y-4">
+            <!-- SETTINGS DRAWER -->
+            <div id="settings-modal" class="p-6 space-y-4">
+                <div class="glass-panel p-6 h-full space-y-4 border-none bg-transparent">
                     <div class="flex justify-between items-center border-b border-white/10 pb-3">
-                        <h2 class="text-white font-bold tracking-widest uppercase">System_Config</h2>
+                        <h2 class="text-white hft-green-glow font-bold tracking-widest uppercase">System_Config</h2>
                         <button onclick="toggleSettings()" class="text-slate-500 hover:text-white">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                                 stroke-width="2">
@@ -599,14 +654,14 @@
         </nav>
 
         <div class="app-layout">
-            <!-- MARGIN FOR SIDEBAR -->
-            <div class="w-[var(--sidebar-w)]"></div>
+            <!-- SIDEBAR OFFSET UNNECESSARY IN FLEX BUT ADDED FOR CONSISTENCY IF NEEDED -->
+            <div class="shrink-0 w-[var(--sidebar-w)] hidden md:block"></div>
 
             <!-- MAIN DASHBOARD -->
             <main class="flex flex-col gap-3 md:gap-4 min-w-0 min-h-0 overflow-hidden">
                 <!-- HEADER -->
                 <header data-tauri-drag-region
-                    class="h-16 md:h-20 glass-panel flex items-center justify-between px-6 md:px-10 shrink-0 gap-4">
+                    class="h-16 md:h-20 glass-panel neon-border flex items-center justify-between px-6 md:px-10 shrink-0 gap-4">
                     <div class="flex items-center gap-3 md:gap-5 shrink-0">
                         <div
                             class="w-8 h-8 md:w-10 md:h-10 rounded-2xl bg-hft-cyan flex items-center justify-center shadow-[0_0_20px_rgba(0,209,255,0.25)] border border-white/10">
@@ -689,10 +744,10 @@
                 <!-- VIEW: DASHBOARD (TERMINAL) -->
                 <div id="view-dashboard"
                     class="view-container active-view flex-1 flex flex-col gap-3 md:gap-4 overflow-hidden">
-                    <!-- WIDGETS ROW -->
-                    <div class="grid grid-cols-2 xl-custom:grid-cols-4 gap-3 md:gap-4 shrink-0">
+                    <!-- WIDGETS ROW (HORIZONTAL) -->
+                    <div class="flex flex-row overflow-x-auto custom-scroll gap-3 md:gap-4 shrink-0 pb-2">
                         <!-- RSI_14 Widget -->
-                        <div class="glass-panel widget-card widget-rsi">
+                        <div class="glass-panel widget-card widget-rsi min-w-[220px] flex-1">
                             <div class="flex justify-between items-start">
                                 <div class="p-2 bg-hft-orange/20 rounded-xl border border-hft-orange/30">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF8C66"
@@ -710,7 +765,7 @@
                         </div>
 
                         <!-- Momentum Widget -->
-                        <div id="mom-card" class="glass-panel widget-card widget-mom">
+                        <div id="mom-card" class="glass-panel widget-card widget-mom min-w-[220px] flex-1">
                             <div class="flex justify-between items-start">
                                 <div class="p-2 bg-hft-red/20 rounded-xl border border-hft-red/30">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF5E8E"
@@ -728,7 +783,7 @@
                         </div>
 
                         <!-- 24h Gainer Widget -->
-                        <div class="glass-panel widget-card widget-gainer">
+                        <div class="glass-panel widget-card widget-gainer min-w-[220px] flex-1">
                             <div class="flex items-center justify-between gap-1">
                                 <div class="relative w-10 h-10 md:w-14 md:h-14 xl-custom:w-16 xl-custom:h-16 shrink-0">
                                     <svg viewBox="0 0 80 80" class="w-full h-full">
@@ -755,7 +810,7 @@
                         </div>
 
                         <!-- Sentiment Widget -->
-                        <div class="glass-panel widget-card widget-sentiment">
+                        <div class="glass-panel widget-card widget-sentiment min-w-[220px] flex-1">
                             <div class="flex justify-between items-start">
                                 <div class="p-2 bg-hft-indigo/20 rounded-xl border border-hft-indigo/30">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#818CF8"
@@ -777,7 +832,7 @@
                     </div>
 
                     <!-- MAIN CHART -->
-                    <div class="glass-panel flex-1 relative flex flex-col p-4 md:p-6 min-h-[180px]">
+                    <div class="glass-panel neon-border flex-1 relative flex flex-col p-4 md:p-6 min-h-[180px]">
                         <div class="flex flex-wrap justify-between items-center mb-4 shrink-0 gap-2">
                             <div class="min-w-0">
                                 <h3 class="text-sm md:text-base font-bold text-white tracking-tight truncate">SOL/USDC
@@ -977,7 +1032,8 @@
         </main>
 
         <!-- CONTROL PANEL (Right Sidebar) -->
-        <aside class="glass-panel flex flex-col h-full overflow-hidden shrink-0 max-h-full relative">
+        <aside
+            class="glass-panel neon-border flex flex-col h-full overflow-hidden shrink-0 max-h-full relative w-[var(--right-panel-w)]">
             <div class="flex border-b border-white/5 shrink-0">
                 <div class="flex border-b border-white/5 shrink-0">
                     <button onclick="switchTab('terminal')" id="tab-terminal"
@@ -1767,8 +1823,10 @@
             }
 
             window.toggleSettings = function () {
-                const el = document.getElementById('settings-modal');
-                el.classList.toggle('hidden');
+                const drawer = document.getElementById('settings-modal');
+                const overlay = document.getElementById('settings-overlay');
+                drawer.classList.toggle('drawer-open');
+                overlay.classList.toggle('active');
             }
 
             window.toggleSound = function () {
