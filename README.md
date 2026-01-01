@@ -41,17 +41,17 @@ DeepEyeSniper is a high-performance, autonomous trading terminal built for the n
 
 ## 🤝 Contributing
 
-DeepEyeSniper is built by and for the community. Whether you are a Rust wizard, a CSS artist, or a strategy researcher, we want your input!
+DeepEyeSniper is **100% Open-Source**. We welcome developers, traders, and AI researchers to build the future of HFT.
 
-- Check out our **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup instructions.
-- Join the **[GitHub Discussions](https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/discussions)** to pitch new features.
+- **Found a bug?** Open an [Issue](https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/issues).
+- **Have an idea?** Start a [Discussion](https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/discussions).
+- **Want to code?** Check out [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## 👥 Contributors
+### ✨ Contributors
 
-Help us build the most powerful open-source sniper in the world.
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+<a href="https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=DeepEyeCrypto/DeepEyeSniperAuto" />
+</a>
 
 ## 📜 License
 
