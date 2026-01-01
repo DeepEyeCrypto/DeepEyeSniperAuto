@@ -38,8 +38,8 @@
         }
 
         :root {
-            --sidebar-w: 72px;
-            --right-panel-w: 360px;
+            --sidebar-w: 80px;
+            --right-panel-w: 350px;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-blur: blur(25px);
@@ -63,10 +63,9 @@
             background: radial-gradient(circle at top left, #12141d 0%, #020304 100%);
             color: #E2E8F0;
             font-family: 'JetBrains Mono', monospace;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            user-select: none;
+            overflow: hidden !important;
+            height: 100vh !important;
+            width: 100vw !important;
             user-select: none;
             transition: box-shadow 0.5s ease-in-out;
         }
@@ -187,8 +186,9 @@
         }
 
         .app-layout {
-            display: flex;
-            flex-direction: row;
+            display: grid;
+            grid-template-columns: 80px 1fr 350px;
+            grid-template-rows: 100%;
             height: 100vh;
             width: 100vw;
             padding: var(--app-padding);
@@ -235,9 +235,9 @@
             pointer-events: auto;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .app-layout {
-                grid-template-columns: calc(var(--sidebar-w) + 10px) 1fr;
+                grid-template-columns: 70px 1fr;
             }
 
             aside {
@@ -654,8 +654,8 @@
         </nav>
 
         <div class="app-layout">
-            <!-- SIDEBAR OFFSET UNNECESSARY IN FLEX BUT ADDED FOR CONSISTENCY IF NEEDED -->
-            <div class="shrink-0 w-[var(--sidebar-w)] hidden md:block"></div>
+            <!-- COLUMN 1: SIDEBAR (Handled by original fixed nav but needs space in grid) -->
+            <div class="w-full h-full"></div>
 
             <!-- MAIN DASHBOARD -->
             <main class="flex flex-col gap-3 md:gap-4 min-w-0 min-h-0 overflow-hidden">
@@ -744,10 +744,10 @@
                 <!-- VIEW: DASHBOARD (TERMINAL) -->
                 <div id="view-dashboard"
                     class="view-container active-view flex-1 flex flex-col gap-3 md:gap-4 overflow-hidden">
-                    <!-- WIDGETS ROW (HORIZONTAL) -->
-                    <div class="flex flex-row overflow-x-auto custom-scroll gap-3 md:gap-4 shrink-0 pb-2">
+                    <!-- WIDGETS ROW (STRICTLY HORIZONTAL) -->
+                    <div class="flex flex-row gap-3 md:gap-4 shrink-0 h-fit">
                         <!-- RSI_14 Widget -->
-                        <div class="glass-panel widget-card widget-rsi min-w-[220px] flex-1">
+                        <div class="glass-panel widget-card widget-rsi flex-1 min-w-0">
                             <div class="flex justify-between items-start">
                                 <div class="p-2 bg-hft-orange/20 rounded-xl border border-hft-orange/30">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF8C66"
@@ -765,7 +765,7 @@
                         </div>
 
                         <!-- Momentum Widget -->
-                        <div id="mom-card" class="glass-panel widget-card widget-mom min-w-[220px] flex-1">
+                        <div id="mom-card" class="glass-panel widget-card widget-mom flex-1 min-w-0">
                             <div class="flex justify-between items-start">
                                 <div class="p-2 bg-hft-red/20 rounded-xl border border-hft-red/30">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF5E8E"
@@ -783,7 +783,7 @@
                         </div>
 
                         <!-- 24h Gainer Widget -->
-                        <div class="glass-panel widget-card widget-gainer min-w-[220px] flex-1">
+                        <div class="glass-panel widget-card widget-gainer flex-1 min-w-0">
                             <div class="flex items-center justify-between gap-1">
                                 <div class="relative w-10 h-10 md:w-14 md:h-14 xl-custom:w-16 xl-custom:h-16 shrink-0">
                                     <svg viewBox="0 0 80 80" class="w-full h-full">
@@ -810,7 +810,7 @@
                         </div>
 
                         <!-- Sentiment Widget -->
-                        <div class="glass-panel widget-card widget-sentiment min-w-[220px] flex-1">
+                        <div class="glass-panel widget-card widget-sentiment flex-1 min-w-0">
                             <div class="flex justify-between items-start">
                                 <div class="p-2 bg-hft-indigo/20 rounded-xl border border-hft-indigo/30">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#818CF8"
@@ -1032,8 +1032,7 @@
         </main>
 
         <!-- CONTROL PANEL (Right Sidebar) -->
-        <aside
-            class="glass-panel neon-border flex flex-col h-full overflow-hidden shrink-0 max-h-full relative w-[var(--right-panel-w)]">
+        <aside class="glass-panel neon-border flex flex-col h-full overflow-hidden shrink-0 max-h-full relative w-full">
             <div class="flex border-b border-white/5 shrink-0">
                 <div class="flex border-b border-white/5 shrink-0">
                     <button onclick="switchTab('terminal')" id="tab-terminal"
