@@ -1,5 +1,4 @@
 use tauri::Emitter;
-use tauri::Manager;
 use futures_util::{StreamExt, SinkExt};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
 use url::Url;
