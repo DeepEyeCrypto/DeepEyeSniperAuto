@@ -50,7 +50,7 @@ DeepEyeSniper is **100% Open-Source**. We welcome developers, traders, and AI re
 ### ✨ Contributors
 
 <a href="https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=DeepEyeCrypto/DeepEyeSniperAuto" />
+  <img src="https://contrib.rocks/image?repo=DeepEyeCrypto/DeepEyeSniperAuto" alt="DeepEyeSniper Contributors" />
 </a>
 
 ## 📜 License
