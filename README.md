@@ -1,7 +1,4 @@
 # 👁️ DeepEyeSniper
-
-![DeepEyeSniper Banner](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
-
 ## Institutional-Grade Open-Source Trading Terminal
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
