@@ -1,6 +1,6 @@
 {
     "productName": "DeepEyeSniper",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "identifier": "com.deepeye.sniper",
     "build": {
         "beforeDevCommand": "npm run dev",
