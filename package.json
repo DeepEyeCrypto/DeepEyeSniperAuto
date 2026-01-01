@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/bump_version.js",
+    "bump": "node scripts/bump_version.js",
     "ship": "node scripts/ship_it.js",
     "build": "vite build",
     "preview": "vite preview",

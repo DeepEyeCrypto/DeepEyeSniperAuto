@@ -569,13 +569,14 @@
                     <div class="space-y-4">
                         <!-- RSI RULE -->
                         <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <label class="text-[9px] text-slate-400 font-bold uppercase block mb-2">Buy Condition (RSI <
-                                    X)</label>
-                                    <input id="strat-rsi" type="range" min="10" max="50" value="30"
-                                        class="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-hft-indigo [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:appearance-none"
-                                        oninput="document.getElementById('lbl-rsi').innerText = this.value">
-                                    <div class="text-right text-[9px] text-hft-indigo font-mono font-bold mt-1"
-                                        id="lbl-rsi">30</div>
+                            <label class="text-[9px] text-slate-400 font-bold uppercase block mb-2">Buy Condition (RSI
+                                &lt;
+                                X)</label>
+                            <input id="strat-rsi" type="range" min="10" max="50" value="30"
+                                class="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-hft-indigo [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:appearance-none"
+                                oninput="document.getElementById('lbl-rsi').innerText = this.value">
+                            <div class="text-right text-[9px] text-hft-indigo font-mono font-bold mt-1" id="lbl-rsi">30
+                            </div>
                         </div>
 
                         <!-- MAX LOSS -->
@@ -1644,7 +1645,7 @@
                 stream.scrollTop = stream.scrollHeight;
 
                 try {
-                    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+                    const ai = new GoogleGenAI({ apiKey: "PLACEHOLDER_API_KEY" });
                     const response = await ai.models.generateContent({
                         model: 'gemini-3-pro-preview',
                         contents: prompt,
