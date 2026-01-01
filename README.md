@@ -1,15 +1,12 @@
-<div align="center">
-<img width="1200" height="475" alt="DeepEyeSniper Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-
 # 👁️ DeepEyeSniper
 
-### Institutional-Grade Open-Source Trading Terminal
+![DeepEyeSniper Banner](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
+
+## Institutional-Grade Open-Source Trading Terminal
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/actions/workflows/release.yml/badge.svg)](https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/actions)
 [![Contributor Friendly](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
-</div>
 
 DeepEyeSniper is a high-performance, autonomous trading terminal built for the next generation of Web3 traders. It combines a zero-latency Rust core with a premium, glassmorphism-inspired UI to provide professional-grade market surveillance and execution.
 
@@ -49,9 +46,7 @@ DeepEyeSniper is **100% Open-Source**. We welcome developers, traders, and AI re
 
 ### ✨ Contributors
 
-<a href="https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=DeepEyeCrypto/DeepEyeSniperAuto" alt="DeepEyeSniper Contributors" />
-</a>
+[![DeepEyeSniper Contributors](https://contrib.rocks/image?repo=DeepEyeCrypto/DeepEyeSniperAuto)](https://github.com/DeepEyeCrypto/DeepEyeSniperAuto/graphs/contributors)
 
 ## 📜 License
 
