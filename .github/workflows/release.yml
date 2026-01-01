@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-12, ubuntu-22.04, windows-latest]
+        platform: [macos-14, ubuntu-22.04, windows-latest]
     runs-on: ${{ matrix.platform }}
     
     steps:
@@ -26,7 +26,7 @@ jobs:
       - name: install rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-12' && 'x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-14' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
           
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
@@ -46,6 +46,7 @@ jobs:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           MACOSX_DEPLOYMENT_TARGET: 10.13
         with:
+          args: ${{ matrix.platform == 'macos-14' && '--target universal-apple-darwin' || '' }}
           tagName: ${{ github.ref_name }}
           releaseName: 'DeepEyeSniper ${{ github.ref_name }}'
           releaseBody: 'See the assets to download this version and install.'
