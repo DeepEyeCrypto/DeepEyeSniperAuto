@@ -1,0 +1,26 @@
+[package]
+name = "deepeye-v5-ultra"
+version = "5.0.0"
+description = "DeepEye V5 Ultra Trading Terminal"
+authors = ["DeepEye Systems"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-http = "2.5.4"
+tauri-plugin-websocket = "2.4.1"
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
+url = "2.5"
+futures-util = "0.3"
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

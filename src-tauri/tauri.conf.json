@@ -1,0 +1,58 @@
+{
+    "productName": "DeepEyeSniper",
+    "version": "1.0.2",
+    "identifier": "com.deepeye.sniper",
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "beforeBuildCommand": "npm run build",
+        "devUrl": "http://localhost:3000",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "windows": [
+            {
+                "title": "DeepEyeSniper",
+                "width": 1200,
+                "height": 800,
+                "resizable": true,
+                "fullscreen": false,
+                "transparent": true,
+                "decorations": true
+            }
+        ],
+        "security": {
+            "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.hyperliquid.xyz https://api.jup.ag https://*.reown.com wss://api.hyperliquid.xyz wss://*.reown.com wss://*.walletconnect.com https://*.walletconnect.com;"
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "macOS": {
+            "entitlements": null,
+            "exceptionDomain": "",
+            "frameworks": [],
+            "providerShortName": null,
+            "signingIdentity": null
+        },
+        "windows": {
+            "certificateThumbprint": null,
+            "digestAlgorithm": "sha256",
+            "timestampUrl": ""
+        },
+        "linux": {
+            "deb": {
+                "depends": []
+            },
+            "rpm": {
+                "depends": []
+            }
+        }
+    }
+}

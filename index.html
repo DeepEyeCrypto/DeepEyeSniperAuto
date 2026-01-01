@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEPEYE V5 ULTRA - CORE_SCAFFOLD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        'xl-custom': '1200px',
+                    },
+                    colors: {
+                        'obsidian-bg': '#020304',
+                        'hft-cyan': '#00D1FF',
+                        'hft-green': '#00FF41',
+                        'hft-red': '#FF5E8E',
+                        'hft-orange': '#FF8C66',
+                        'hft-indigo': '#818CF8',
+                        'hft-amber': '#F59E0B',
+                    },
+                    fontFamily: { mono: ['JetBrains Mono', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sidebar-w: 72px;
+            --right-panel-w: 360px;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(25px);
+            --neon-green: #00FF41;
+            --mom-pulse-speed: 2s;
+            --app-padding: 15px;
+            --app-gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --app-padding: 8px;
+                --app-gap: 8px;
+            }
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at top left, #12141d 0%, #020304 100%);
+            color: #E2E8F0;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            user-select: none;
+            transition: box-shadow 0.5s ease-in-out;
+        }
+
+        .glow-pump {
+            box-shadow: inset 0 0 50px rgba(0, 255, 65, 0.3), 0 0 30px rgba(0, 255, 65, 0.2);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .glow-dump {
+            box-shadow: inset 0 0 50px rgba(255, 94, 142, 0.3), 0 0 30px rgba(255, 94, 142, 0.2);
+            border: 1px solid rgba(255, 94, 142, 0.3);
+        }
+
+        /* FLOATING PILL SIDEBAR */
+        nav#main-sidebar {
+            width: var(--sidebar-w);
+            z-index: 1000;
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: fit-content;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            gap: 12px;
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-w: 60px;
+                --right-panel-w: 300px;
+            }
+
+            nav#main-sidebar {
+                left: 5px;
+                padding: 16px 0;
+                gap: 8px;
+            }
+
+            .nav-btn {
+                width: 44px !important;
+                height: 44px !important;
+            }
+
+            .nav-btn svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+        }
+
+        .nav-btn {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: pointer;
+            border-radius: 50%;
+            color: #475569;
+            background: transparent;
+            position: relative;
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 1.5px;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .nav-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.1);
+        }
+
+        .nav-btn.active-nav {
+            background: var(--neon-green) !important;
+            color: black !important;
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.5);
+        }
+
+        /* GLASS PANELS */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: calc(var(--sidebar-w) + 20px) 1fr var(--right-panel-w);
+            grid-template-rows: 100%;
+            height: 100vh;
+            width: 100vw;
+            padding: var(--app-padding);
+            gap: var(--app-gap);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .app-layout {
+                grid-template-columns: calc(var(--sidebar-w) + 10px) 1fr;
+            }
+
+            aside {
+                display: none !important;
+            }
+        }
+
+        .view-container {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            display: none;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .view-container.active-view {
+            display: flex;
+        }
+
+        /* FLUID TYPOGRAPHY */
+        .fluid-title {
+            font-size: clamp(8px, 0.8vw, 10px);
+        }
+
+        .fluid-value {
+            font-size: clamp(20px, 2.5vw, 32px);
+            line-height: 1.1;
+        }
+
+        .fluid-sub {
+            font-size: clamp(7px, 0.7vw, 9px);
+        }
+
+        /* WIDGET SPECIFIC STYLING */
+        .widget-card {
+            padding: clamp(8px, 1.2vw, 20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            min-height: 110px;
+        }
+
+        .widget-rsi {
+            background: linear-gradient(135deg, rgba(255, 140, 102, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+            border-color: rgba(255, 140, 102, 0.2);
+        }
+
+        .widget-mom {
+            background: linear-gradient(135deg, rgba(255, 94, 142, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+            border-color: rgba(255, 94, 142, 0.2);
+            animation: momentum-pulse var(--mom-pulse-speed) infinite ease-in-out;
+        }
+
+        .widget-gainer {
+            background: linear-gradient(135deg, rgba(0, 255, 194, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+            border-color: rgba(0, 255, 194, 0.2);
+        }
+
+        .widget-sentiment {
+            background: linear-gradient(135deg, rgba(129, 140, 248, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+            border-color: rgba(129, 140, 248, 0.2);
+        }
+
+        @keyframes momentum-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(255, 94, 142, 0);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 94, 142, 0.2);
+                transform: scale(1.01);
+            }
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .header-search {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--hft-cyan);
+            border-bottom-color: var(--hft-cyan);
+        }
+
+        @keyframes scanline {
+            0% {
+                top: -10%;
+            }
+
+            100% {
+                top: 110%;
+            }
+        }
+
+        .scanline {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 65, 0.02);
+            z-index: 50;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+
+        #main-canvas {
+            image-rendering: -webkit-optimize-contrast;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Orderbook stream height limit on mobile */
+        @media (max-width: 1024px) {
+
+            #asks-stream,
+            #bids-stream {
+                max-height: 100px !important;
+            }
+        }
+
+        /* Scrollbar styles */
+        .custom-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Bubble styles for Intelligence */
+        .ai-bubble {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* COLLAPSIBLE PANEL */
+        #bottom-intelligence-panel {
+            transition: height 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .panel-collapsed {
+            height: 44px !important;
+        }
+
+        .panel-expanded {
+            height: 280px !important;
+        }
+
+        /* CRT EFFECT */
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .crt-active {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+        }
+
+        /* ALPHA RADAR TICKER */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* GHOST MODE ("THE MATRIX") */
+        .ghost-mode .sensitive-data {
+            filter: blur(6px);
+            color: transparent !important;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+    </style>
+    <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@reown/appkit": "https://esm.sh/@reown/appkit@1.6.0",
+    "@reown/appkit-adapter-wagmi": "https://esm.sh/@reown/appkit-adapter-wagmi@1.6.0",
+    "@reown/appkit-adapter-solana": "https://esm.sh/@reown/appkit-adapter-solana@1.6.0",
+    "@wagmi/core": "https://esm.sh/@wagmi/core@2.6.5",
+    "viem": "https://esm.sh/viem@2.7.1",
+    "@solana/web3.js": "https://esm.sh/@solana/web3.js@1.87.6"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/index.css">
+</head>
+
+<body>
+
+    <body>
+        <div id="crt-layer" class="crt-overlay crt-active"></div>
+        <div class="scanline"></div>
+
+        <!-- FLOATING PILL SIDEBAR -->
+        <nav id="main-sidebar">
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn active-nav" title="Terminal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+            </button>
+            <button onclick="switchView('intelligence')" id="nav-intelligence" class="nav-btn"
+                title="AI Intelligence Full">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M12 6v6l4 2" />
+                </svg>
+            </button>
+            <button onclick="switchView('stats')" id="nav-stats" class="nav-btn" title="Market Stats">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 20V10M12 20V4M6 20v-6" />
+                </svg>
+            </button>
+            <button onclick="switchView('web')" id="nav-web" class="nav-btn" title="CryptoBubbles">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="4" />
+                    <line x1="21.17" y1="8" x2="12" y2="8" />
+                    <line x1="3.95" y1="6.06" x2="8.54" y2="14" />
+                    <line x1="10.88" y1="21.94" x2="15.46" y2="14" />
+                </svg>
+            </button>
+            <div class="mt-4 md:mt-8 border-t border-white/5 w-8 pt-4 flex flex-col gap-4">
+                <button onclick="toggleSettings()" class="nav-btn !w-10 !h-10 text-slate-600 hover:text-white"
+                    title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65
+                        0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9
+                        19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0
+                        .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65
+                        1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0
+                        1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51
+                        1.65
+                        1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33
+                        1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- SETTINGS MODAL -->
+            <div id="settings-modal"
+                class="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] hidden flex items-center justify-center">
+                <div class="glass-panel p-6 w-[90%] max-w-md space-y-4">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                        <h2 class="text-white font-bold tracking-widest uppercase">System_Config</h2>
+                        <button onclick="toggleSettings()" class="text-slate-500 hover:text-white">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Audio_FX</span>
+                            <div onclick="toggleSound()" id="btn-sound"
+                                class="cursor-pointer px-3 py-1 rounded bg-hft-green/20 text-hft-green text-[9px] font-bold border border-hft-green/30">
+                                ENABLED</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">CRT_Effects</span>
+                            <div onclick="toggleCRT()" id="btn-crt"
+                                class="cursor-pointer px-3 py-1 rounded bg-hft-green/20 text-hft-green text-[9px] font-bold border border-hft-green/30">
+                                ENABLED</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Session_Keys (1H)</span>
+                            <div onclick="toggleSession()" id="btn-session"
+                                class="cursor-pointer px-3 py-1 rounded bg-hft-red/20 text-hft-red text-[9px] font-bold border border-hft-red/30">
+                                DISABLED</div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Telegram_Bridge</span>
+                            <input id="tg-token" type="password" placeholder="Bot Token"
+                                class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:border-hft-cyan outline-none font-mono">
+                            <input id="tg-chat" type="text" placeholder="Chat ID"
+                                class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:border-hft-cyan outline-none font-mono mt-1">
+                        </div>
+
+                        <!-- STEALTH GATEWAY -->
+                        <div class="space-y-1 pt-2 border-t border-white/5">
+                            <span class="text-[10px] text-hft-orange font-bold uppercase flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor">
+                                    <path
+                                        d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+                                    <path d="M2 12h20" />
+                                </svg>
+                                Stealth_Gateway
+                            </span>
+                            <input id="rpc-endpoint" type="text" placeholder="Private RPC Endpoint"
+                                class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:border-hft-orange outline-none font-mono">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-slate-500 font-mono">JITO_TIP (SOL):</span>
+                                <input id="jito-tip" type="number" step="0.001" placeholder="0.005"
+                                    class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:border-hft-orange outline-none font-mono">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="toggleSettings()"
+                        class="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white transition-all">Save
+                        & Close</button>
+                </div>
+            </div>
+
+            <!-- STRATEGY BUILDER MODAL -->
+            <div id="strategy-modal"
+                class="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] hidden flex items-center justify-center">
+                <div
+                    class="glass-panel p-6 w-[90%] max-w-md space-y-4 border border-hft-indigo/30 shadow-[0_0_50px_rgba(129,140,248,0.1)]">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-hft-indigo animate-pulse"></div>
+                            <h2 class="text-white font-bold tracking-widest uppercase">Auto_Pilot_V1</h2>
+                        </div>
+                        <button onclick="toggleStrategy()" class="text-slate-500 hover:text-white">✕</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- RSI RULE -->
+                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                            <label class="text-[9px] text-slate-400 font-bold uppercase block mb-2">Buy Condition (RSI <
+                                    X)</label>
+                                    <input id="strat-rsi" type="range" min="10" max="50" value="30"
+                                        class="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-hft-indigo [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:appearance-none"
+                                        oninput="document.getElementById('lbl-rsi').innerText = this.value">
+                                    <div class="text-right text-[9px] text-hft-indigo font-mono font-bold mt-1"
+                                        id="lbl-rsi">30</div>
+                        </div>
+
+                        <!-- MAX LOSS -->
+                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                            <label class="text-[9px] text-slate-400 font-bold uppercase block mb-2">Safety Circuit - Max
+                                Loss ($)</label>
+                            <input id="strat-max-loss" type="number" value="500"
+                                class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[10px] text-white focus:border-hft-indigo outline-none font-mono">
+                        </div>
+
+                        <!-- TOGGLE -->
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-[10px] text-white font-bold uppercase">Engine Status</span>
+                            <button id="btn-autopilot" onclick="toggleAutoPilot()"
+                                class="px-4 py-2 rounded bg-hft-red/20 text-hft-red text-[9px] font-bold border border-hft-red/30 tracking-widest transition-all">DISENGAGED</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="app-layout">
+            <!-- MARGIN FOR SIDEBAR -->
+            <div class="w-[var(--sidebar-w)]"></div>
+
+            <!-- MAIN DASHBOARD -->
+            <main class="flex flex-col gap-3 md:gap-4 min-w-0 min-h-0 overflow-hidden">
+                <!-- HEADER -->
+                <header data-tauri-drag-region
+                    class="h-16 md:h-20 glass-panel flex items-center justify-between px-6 md:px-10 shrink-0 gap-4">
+                    <div class="flex items-center gap-3 md:gap-5 shrink-0">
+                        <div
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-2xl bg-hft-cyan flex items-center justify-center shadow-[0_0_20px_rgba(0,209,255,0.25)] border border-white/10">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="black"
+                                stroke-width="2.5">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1
+                                class="text-xs md:text-sm font-bold tracking-widest text-white uppercase leading-none mb-1">
+                                DEEPEYESNIPER</h1>
+                            <span id="app-version"
+                                class="text-[7px] md:text-[8px] text-hft-cyan font-mono opacity-60 uppercase font-bold tracking-tighter">INITIALIZING...</span>
+
+                            <!-- SYSTEM HEALTH WIDGET -->
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <div class="flex items-center gap-0.5">
+                                    <div class="w-1 h-1 rounded-full bg-hft-green animate-pulse"></div>
+                                    <span class="text-[6px] text-slate-400 font-mono">RPC:MAIN</span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <div class="w-1 h-1 rounded-full bg-hft-cyan"></div>
+                                    <span class="text-[6px] text-slate-400 font-mono">ENG:RUST</span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <span class="text-[6px] text-hft-green font-mono">9ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOM WINDOW CONTROLS -->
+                    <div class="absolute top-0 right-0 p-4 flex gap-2 z-50 window-controls hidden md:flex">
+                        <button onclick="window.__TAURI__.window.getCurrentWindow().minimize()"
+                            class="w-3 h-3 rounded-full bg-hft-cyan/50 hover:bg-hft-cyan border border-hft-cyan/30 transition-colors"></button>
+                        <button onclick="window.__TAURI__.window.getCurrentWindow().close()"
+                            class="w-3 h-3 rounded-full bg-hft-red/50 hover:bg-hft-red border border-hft-red/30 transition-colors"></button>
+                    </div>
+
+                    <div class="flex-1 max-w-sm relative hidden sm:block">
+                        <div class="header-search flex items-center px-4 py-1.5 rounded-full group">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                                stroke-width="2"
+                                class="text-slate-500 mr-3 transition-colors group-focus-within:text-hft-cyan">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input type="text" placeholder="Search..."
+                                class="bg-transparent border-none outline-none text-[10px] text-white w-full placeholder:text-slate-600 font-mono">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 md:gap-5 shrink-0">
+                        <div id="wallet-connect-btn"
+                            class="bg-white/5 border border-white/10 rounded-2xl flex items-center p-1.5 pr-2 md:pr-4 gap-2 md:gap-3 cursor-pointer hover:bg-white/10 transition-all">
+                            <div class="w-7 h-7 md:w-8 md:h-8 rounded-xl overflow-hidden border border-white/10">
+                                <img id="wallet-avatar"
+                                    src="https://api.dicebear.com/7.x/pixel-art/svg?seed=DeepEyeMaster" alt="Avatar"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex flex-col hidden md:flex min-w-[120px]">
+                                <span id="wallet-label"
+                                    class="text-[10px] font-bold text-white leading-none mb-1 sensitive-data">Quantum_Admin</span>
+                                <!-- MULTI-CHAIN HUB -->
+                                <div class="flex gap-2 items-center text-[7px] font-mono opacity-80">
+                                    <span class="text-hft-cyan sensitive-data">SOL: <span
+                                            id="bal-sol">145.2</span></span>
+                                    <span class="text-slate-500">|</span>
+                                    <span class="text-white sensitive-data">USDC: <span id="bal-usdc">5.4k</span></span>
+                                    <span class="text-slate-500">|</span>
+                                    <span class="text-hft-green sensitive-data">HL: <span
+                                            id="bal-hl">250.0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- VIEW: DASHBOARD (TERMINAL) -->
+                <div id="view-dashboard"
+                    class="view-container active-view flex-1 flex flex-col gap-3 md:gap-4 overflow-hidden">
+                    <!-- WIDGETS ROW -->
+                    <div class="grid grid-cols-2 xl-custom:grid-cols-4 gap-3 md:gap-4 shrink-0">
+                        <!-- RSI_14 Widget -->
+                        <div class="glass-panel widget-card widget-rsi">
+                            <div class="flex justify-between items-start">
+                                <div class="p-2 bg-hft-orange/20 rounded-xl border border-hft-orange/30">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF8C66"
+                                        stroke-width="2">
+                                        <path d="M18 20V10M12 20V4M6 20v-6" />
+                                    </svg>
+                                </div>
+                                <span
+                                    class="font-bold text-hft-orange uppercase tracking-widest fluid-title">RSI_14</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white fluid-value" id="val-rsi">52.4</div>
+                                <div class="text-slate-500 font-mono uppercase fluid-sub">Relative Strength</div>
+                            </div>
+                        </div>
+
+                        <!-- Momentum Widget -->
+                        <div id="mom-card" class="glass-panel widget-card widget-mom">
+                            <div class="flex justify-between items-start">
+                                <div class="p-2 bg-hft-red/20 rounded-xl border border-hft-red/30">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#FF5E8E"
+                                        stroke-width="2">
+                                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                    </svg>
+                                </div>
+                                <span
+                                    class="font-bold text-hft-red uppercase tracking-widest fluid-title">Momentum</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white fluid-value" id="val-mom">84%</div>
+                                <div class="text-slate-500 font-mono uppercase fluid-sub">HFT Pressure</div>
+                            </div>
+                        </div>
+
+                        <!-- 24h Gainer Widget -->
+                        <div class="glass-panel widget-card widget-gainer">
+                            <div class="flex items-center justify-between gap-1">
+                                <div class="relative w-10 h-10 md:w-14 md:h-14 xl-custom:w-16 xl-custom:h-16 shrink-0">
+                                    <svg viewBox="0 0 80 80" class="w-full h-full">
+                                        <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.05)"
+                                            stroke-width="6" fill="transparent" r="34" cx="40" cy="40" />
+                                        <circle class="progress-ring__circle" id="circle-gainer" stroke="#00FFC2"
+                                            stroke-width="6" stroke-linecap="round" fill="transparent" r="34" cx="40"
+                                            cy="40" style="stroke-dasharray: 213.6; stroke-dashoffset: 213.6;" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="font-bold text-hft-green fluid-sub"
+                                            id="val-gainer-pct">+0.0%</span>
+                                    </div>
+                                </div>
+                                <div class="text-right min-w-0">
+                                    <span
+                                        class="font-bold text-hft-green uppercase tracking-widest block fluid-title">Top
+                                        Gainer</span>
+                                    <div class="font-bold text-white truncate fluid-value" id="val-gainer-symbol">---
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-slate-500 font-mono uppercase fluid-sub">24h Progress</div>
+                        </div>
+
+                        <!-- Sentiment Widget -->
+                        <div class="glass-panel widget-card widget-sentiment">
+                            <div class="flex justify-between items-start">
+                                <div class="p-2 bg-hft-indigo/20 rounded-xl border border-hft-indigo/30">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#818CF8"
+                                        stroke-width="2">
+                                        <path
+                                            d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+                                        <path d="M12 6v6l4 2" />
+                                    </svg>
+                                </div>
+                                <span
+                                    class="font-bold text-hft-indigo uppercase tracking-widest fluid-title">Sentiment</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white fluid-value" id="val-sentiment">NEUTRAL</div>
+                                <div class="text-slate-500 font-mono uppercase fluid-sub">F&G Index: <span
+                                        id="val-sentiment-score">50</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MAIN CHART -->
+                    <div class="glass-panel flex-1 relative flex flex-col p-4 md:p-6 min-h-[180px]">
+                        <div class="flex flex-wrap justify-between items-center mb-4 shrink-0 gap-2">
+                            <div class="min-w-0">
+                                <h3 class="text-sm md:text-base font-bold text-white tracking-tight truncate">SOL/USDC
+                                    Price
+                                    Action</h3>
+                                <p class="text-[8px] md:text-[9px] text-slate-500 font-mono uppercase tracking-widest">
+                                    HFT_STREAM_LIVE</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="text-right">
+                                    <span class="text-[8px] text-slate-500 uppercase font-bold block">Mark</span>
+                                    <div class="text-xs md:text-sm font-bold text-white font-mono" id="current-price">
+                                        $145.228</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 relative min-h-0">
+                            <canvas id="main-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- COLLAPSIBLE AI/LOG PANEL -->
+                    <div id="bottom-intelligence-panel"
+                        class="glass-panel panel-collapsed shrink-0 flex flex-col overflow-hidden bg-black/40 border border-white/10">
+                        <div onclick="togglePanel()"
+                            class="h-[44px] px-6 flex items-center justify-between cursor-pointer hover:bg-white/[0.03] transition-colors shrink-0">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-hft-cyan animate-pulse"></div>
+                                <span
+                                    class="text-[9px] font-bold uppercase tracking-[0.2em] text-hft-cyan">Intelligence_Core
+                                    & Execution_Logs</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-[8px] font-mono text-slate-500 hidden md:block">KERNEL_STABLE:
+                                    0.42ms</span>
+                                <svg id="panel-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    class="text-slate-500 transition-transform duration-300">
+                                    <path d="M18 15l-6-6-6 6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-h-0 flex flex-col md:flex-row gap-4 p-4 border-t border-white/5">
+                            <!-- Mini Chat -->
+                            <div
+                                class="flex-1 flex flex-col min-h-0 bg-black/20 rounded-2xl border border-white/5 overflow-hidden">
+                                <div id="panel-chat-stream"
+                                    class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll text-[10px]">
+                                    <div class="text-slate-500 font-mono italic">V5 Intelligence ready. Query telemetry
+                                        or
+                                        signal flow...</div>
+                                </div>
+                                <div class="p-3 bg-white/[0.02] border-t border-white/5">
+                                    <div class="relative">
+                                        <input id="panel-ai-input" type="text" placeholder="Query AI..."
+                                            class="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-4 pr-10 text-[10px] text-white focus:outline-none focus:border-hft-cyan/50">
+                                        <button id="panel-ai-send"
+                                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-hft-cyan text-black flex items-center justify-center">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none"
+                                                stroke="currentColor" stroke-width="3">
+                                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Micro Logs -->
+                            <div
+                                class="w-full md:w-[300px] flex flex-col bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
+                                <div
+                                    class="p-2 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
+                                    <span
+                                        class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">System_Stream</span>
+                                    <div class="flex gap-1">
+                                        <div class="w-1 h-1 rounded-full bg-hft-green"></div>
+                                        <div class="w-1 h-1 rounded-full bg-hft-cyan"></div>
+                                    </div>
+                                </div>
+                                <div id="system-logs-stream"
+                                    class="flex-1 overflow-y-auto p-3 font-mono text-[8px] custom-scroll text-slate-400 space-y-1">
+                                    <div>[0.4ms] KERNEL_ATTACHED</div>
+                                    <div>[SYS] SOL_DEX_LOADED</div>
+                                    <div>[SYS] MEMPOOL_SNIFFER_UP</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ALPHA RADAR TICKER -->
+                    <div class="h-6 bg-black/60 border-t border-white/10 flex items-center overflow-hidden shrink-0">
+                        <div
+                            class="px-2 bg-hft-green/20 h-full flex items-center text-[7px] font-bold text-hft-green uppercase tracking-widest z-10 border-r border-hft-green/30">
+                            ALPHA_RADAR</div>
+                        <div class="marquee-container flex-1">
+                            <div id="alpha-ticker"
+                                class="marquee-content text-[8px] font-mono text-slate-400 flex gap-8 items-center h-full px-4">
+                                <span>SCANNING_DEX...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!-- VIEW: INTELLIGENCE FULL -->
+        <div id="view-intelligence" class="view-container flex-1 overflow-hidden">
+            <div class="glass-panel h-full flex flex-col overflow-hidden max-h-full">
+                <div
+                    class="p-5 md:p-6 border-b border-white/5 flex items-center justify-between shrink-0 bg-white/[0.01]">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-hft-cyan/20 flex items-center justify-center border border-hft-cyan/30 text-hft-cyan">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-sm md:text-base font-bold tracking-tight">AI Intelligence
+                                Full View</h2>
+                            <p class="text-[9px] md:text-[10px] text-slate-500 font-mono uppercase tracking-widest">
+                                Gemini 3 Pro Hybrid Neural Link</p>
+                        </div>
+                    </div>
+                    <button onclick="clearChat()"
+                        class="text-[9px] md:text-[10px] text-slate-600 font-bold uppercase tracking-widest hover:text-white transition-colors">Flush_Memory</button>
+                </div>
+                <div id="chat-stream" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scroll">
+                    <div class="flex gap-4 ai-bubble">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-hft-cyan/20 border border-hft-cyan/30 flex items-center justify-center text-hft-cyan shrink-0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+                                <circle cx="12" cy="12" r="2" />
+                            </svg>
+                        </div>
+                        <div class="bg-white/5 border border-white/5 p-4 rounded-2xl rounded-tl-none max-w-[80%]">
+                            <p class="text-xs md:text-sm text-slate-300 leading-relaxed">Full screen
+                                Intelligence
+                                link active. Global telemetry data is being parsed for anomalies.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 md:p-6 bg-white/[0.02] border-t border-white/5 shrink-0">
+                    <div class="relative group max-w-4xl mx-auto">
+                        <input id="ai-input" type="text" placeholder="Query full core..."
+                            class="w-full bg-black/40 border border-white/10 rounded-2xl py-3 md:py-4 pl-6 pr-16 text-xs md:text-sm text-white focus:outline-none focus:border-hft-cyan/50 focus:shadow-[0_0_20px_rgba(0,209,255,0.1)] transition-all">
+                        <button id="ai-send"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-xl bg-hft-cyan text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg active:scale-95">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: WEB (CRYPTOBUBBLES) -->
+        <div id="view-web" class="view-container flex-1">
+            <div class="glass-panel h-full overflow-hidden">
+                <iframe src="https://cryptobubbles.net" class="w-full h-full border-none rounded-[32px]"></iframe>
+            </div>
+        </div>
+
+        <!-- VIEW: STATS -->
+        <div id="view-stats" class="view-container flex-1 overflow-y-auto custom-scroll pr-1">
+            <div class="glass-panel h-full p-6 md:p-10 flex flex-col items-center justify-center text-center space-y-6">
+                <div
+                    class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-hft-indigo/20 border border-hft-indigo/40 flex items-center justify-center text-hft-indigo shadow-[0_0_40px_rgba(129,140,248,0.2)]">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M18 20V10M12 20V4M6 20v-6" />
+                    </svg>
+                </div>
+                <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight">Market Stats</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 w-full max-w-2xl mt-4">
+                    <div class="bg-white/5 border border-white/10 p-4 rounded-3xl">
+                        <span
+                            class="text-[8px] md:text-[9px] text-slate-500 uppercase font-bold tracking-widest block mb-1">Dominance</span>
+                        <div class="text-lg md:text-xl font-bold text-white">52.4%</div>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 p-4 rounded-3xl">
+                        <span
+                            class="text-[8px] md:text-[9px] text-slate-500 uppercase font-bold tracking-widest block mb-1">Liquidity</span>
+                        <div class="text-lg md:text-xl font-bold text-white">$2.4B</div>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 p-4 rounded-3xl">
+                        <span
+                            class="text-[8px] md:text-[9px] text-slate-500 uppercase font-bold tracking-widest block mb-1">Volatility</span>
+                        <div class="text-lg md:text-xl font-bold text-hft-red">HIGH</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </main>
+
+        <!-- CONTROL PANEL (Right Sidebar) -->
+        <aside class="glass-panel flex flex-col h-full overflow-hidden shrink-0 max-h-full relative">
+            <div class="flex border-b border-white/5 shrink-0">
+                <div class="flex border-b border-white/5 shrink-0">
+                    <button onclick="switchTab('terminal')" id="tab-terminal"
+                        class="tab-btn flex-1 py-3 md:py-4 text-[9px] font-bold uppercase tracking-widest text-slate-500 active">Orderbook</button>
+                    <button onclick="switchTab('onchain')" id="tab-onchain"
+                        class="tab-btn flex-1 py-3 md:py-4 text-[9px] font-bold uppercase tracking-widest text-slate-500">Scan</button>
+                    <button onclick="toggleStrategy()" id="tab-strategy"
+                        class="tab-btn flex-1 py-3 md:py-4 text-[9px] font-bold uppercase tracking-widest text-hft-indigo hover:text-white transition-colors">Auto-Pilot</button>
+                </div>
+
+                <!-- SCROLLABLE CONTENT AREA -->
+                <div class="flex-1 flex flex-col min-h-0 overflow-hidden mb-[100px]">
+                    <div id="content-terminal" class="flex-1 flex flex-col min-h-0 overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-white/5 space-y-4 md:space-y-5 shrink-0">
+                            <div
+                                class="flex items-center justify-between text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <span>PRESSURE_RATIO</span>
+                                <span class="font-mono text-white" id="val-pressure-text">B:50% | S:50%</span>
+                            </div>
+                            <div class="h-1.5 flex gap-0.5 w-full bg-black/40 rounded-full overflow-hidden">
+                                <div id="pressure-buy"
+                                    class="h-full bg-hft-green shadow-[0_0_10px_var(--hft-green)] transition-all duration-500"
+                                    style="width: 50%"></div>
+                                <div id="pressure-sell"
+                                    class="h-full bg-hft-red shadow-[0_0_10px_var(--hft-red)] transition-all duration-500"
+                                    style="width: 50%"></div>
+                            </div>
+
+                            <!-- WHALE FEED -->
+                            <div class="mt-4 pt-4 border-t border-white/5">
+                                <div
+                                    class="flex items-center justify-between text-[8px] font-bold text-hft-amber uppercase tracking-widest mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor">
+                                            <path
+                                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8 8 8z" />
+                                        </svg>
+                                        WHALE_WATCH
+                                    </span>
+                                    <span class="animate-pulse">LIVE</span>
+                                </div>
+                                <div id="whale-feed" class="flex flex-col gap-1.5 min-h-[50px]">
+                                    <div class="text-[9px] font-mono text-slate-600 text-center italic py-2">Scanning
+                                        for
+                                        >$50k...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LIVE ORDERBOOK STREAM -->
+                        <!-- ------------------------------------------------------------------ -->
+                        <div class="flex-1 min-h-0 flex flex-col relative">
+                            <!-- ANTI-RUG TRUST SCORE -->
+                            <div
+                                class="absolute top-2 right-2 z-10 flex items-center gap-2 bg-black/60 backdrop-blur rounded-lg px-2 py-1 border border-white/5">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor"
+                                    class="text-hft-green">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                                <div class="flex flex-col items-end">
+                                    <span
+                                        class="text-[6px] text-slate-500 font-bold uppercase tracking-widest">TRUST_SCORE</span>
+                                    <span id="val-trust-score"
+                                        class="text-[9px] font-bold text-hft-green leading-none">100/100</span>
+                                </div>
+                            </div>
+
+                            <div class="h-6 flex items-center px-4 shrink-0 justify-between bg-white/[0.02]">
+                                <span
+                                    class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Ask_Stream</span>
+                                <div class="flex gap-1">
+                                    <div class="w-1 h-1 rounded-full bg-hft-red"></div>
+                                    <div class="w-1 h-1 rounded-full bg-hft-orange"></div>
+                                </div>
+                            </div>
+                            <div id="asks-stream"
+                                class="flex-1 flex flex-col justify-end p-4 md:p-5 font-mono text-[9px] overflow-y-auto custom-scroll">
+                            </div>
+                            <div
+                                class="h-14 md:h-16 border-y border-white/5 flex items-center justify-center bg-white/[0.02] relative shrink-0">
+                                <span id="price-book"
+                                    class="text-lg md:text-xl font-bold text-white relative z-10 font-mono">---</span>
+                            </div>
+                            <div id="bids-stream"
+                                class="flex-1 flex flex-col p-4 md:p-5 font-mono text-[9px] overflow-y-auto custom-scroll">
+                            </div>
+                            <div class="h-6 flex items-center px-4 shrink-0 justify-between bg-white/[0.02]">
+                                <span
+                                    class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Bid_Stream</span>
+                                <div class="flex gap-1">
+                                    <div class="w-1 h-1 rounded-full bg-hft-green"></div>
+                                    <div class="w-1 h-1 rounded-full bg-hft-cyan"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="content-onchain"
+                        class="flex-1 flex flex-col min-h-0 hidden p-5 md:p-6 space-y-3 max-h-full overflow-y-auto custom-scroll">
+                        <div
+                            class="bg-hft-green/10 border border-hft-green/20 p-3 rounded-2xl flex justify-between items-center">
+                            <span
+                                class="text-[9px] font-bold text-hft-green uppercase tracking-widest">SOL_SCAN_ACTIVE</span>
+                            <div class="w-1.5 h-1.5 rounded-full bg-hft-green animate-pulse"></div>
+                        </div>
+                        <div id="gainer-list" class="flex-1 space-y-2 text-[9px] font-mono"></div>
+                    </div>
+                </div>
+
+                <!-- PINNED EXECUTION BUTTONS -->
+                <div
+                    class="absolute bottom-0 left-0 right-0 p-5 md:p-6 border-t border-white/5 bg-black/80 backdrop-blur-xl space-y-3 shrink-0 z-20 h-auto pb-8">
+
+                    <!-- HFT OVERLAY CONTROLS -->
+                    <div class="flex justify-between items-center mb-2">
+                        <!-- SAFE MODE TOGGLE -->
+                        <div class="flex items-center gap-2 cursor-pointer group" onclick="toggleSafeguard()">
+                            <div id="safeguard-toggle"
+                                class="w-8 h-4 bg-hft-green rounded-full relative transition-colors shadow-[0_0_10px_rgba(0,255,65,0.2)]">
+                                <div id="safeguard-knob"
+                                    class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform">
+                                </div>
+                            </div>
+                            <span id="safeguard-label"
+                                class="text-[8px] font-bold text-hft-green uppercase tracking-widest group-hover:text-white transition-colors">SAFE_MODE_ON</span>
+                        </div>
+
+                        <!-- GAS SLIDER -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">GAS:</span>
+                            <div class="relative w-24 group">
+                                <input type="range" min="1" max="3" value="1" step="1" oninput="updateGas(this.value)"
+                                    class="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-hft-cyan">
+                            </div>
+                            <span id="gas-label" class="text-[8px] font-mono text-hft-cyan font-bold">STD</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btn-panic-buy" onclick="execute('BUY')"
+                            class="py-3 bg-hft-green text-black font-bold text-[10px] rounded-xl hover:scale-[1.05] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)] uppercase tracking-widest">BUY</button>
+                        <button id="btn-panic-short" onclick="execute('SELL')"
+                            class="py-3 bg-hft-red text-white font-bold text-[10px] rounded-xl hover:scale-[1.05] transition-all shadow-[0_0_20px_rgba(255,94,142,0.3)] uppercase tracking-widest">SELL</button>
+                    </div>
+                    <div class="text-[7px] text-slate-600 font-bold uppercase tracking-[0.2em] text-center">Safeguard
+                        v5.0.1
+                        Active</div>
+                </div>
+        </aside>
+        </div>
+
+        <script type="module">
+            import { GoogleGenAI } from "@google/genai";
+            import { createAppKit } from '@reown/appkit';
+            import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+            import { SolanaAdapter } from '@reown/appkit-adapter-solana';
+            import { mainnet, arbitrum } from '@wagmi/core/chains';
+            import { signMessage } from '@wagmi/core';
+            import { listen } from '@tauri-apps/api/event';
+
+            // --- REOWN APPKIT CONFIGURATION ---
+            const projectId = '0911782294101cc7a4697394622b137a';
+
+            const networks = [mainnet, arbitrum]; // Add Hyperliquid/custom chains if needed
+
+            const wagmiAdapter = new WagmiAdapter({
+                projectId,
+                networks
+            });
+
+            const solanaAdapter = new SolanaAdapter({
+                projectId
+            });
+
+            const metadata = {
+                name: 'DeepEye V5 Ultra',
+                description: 'Institutional Grade Trading Terminal',
+                url: 'https://deepeye.ai',
+                icons: ['https://avatars.githubusercontent.com/u/179229932']
+            };
+
+            const appKit = createAppKit({
+                adapters: [wagmiAdapter, solanaAdapter],
+                networks: networks,
+                metadata: metadata,
+                projectId,
+                themeMode: 'dark',
+                themeVariables: {
+                    '--w3m-font-family': 'Inter, Roboto, sans-serif',
+                    '--w3m-accent': '#00FF41',
+                    '--w3m-color-mix': '#060809',
+                    '--w3m-color-mix-strength': 40
+                },
+                features: {
+                    analytics: true
+                }
+            });
+
+            // ANTIGRAVITY HOOKS (Simulated for Global State)
+            function updateWalletState() {
+                const account = appKit.getIsConnectedState();
+                const address = appKit.getAddress();
+                const chainId = appKit.getChainId();
+
+                state.wallet.isConnected = account;
+                state.wallet.address = address;
+
+                // UI Update Logic
+                const btn = document.getElementById('wallet-connect-btn');
+                const label = document.getElementById('wallet-label');
+
+                // Multi-Chain State
+                const balSol = document.getElementById('bal-sol');
+                const balUsdc = document.getElementById('bal-usdc');
+                const balHl = document.getElementById('bal-hl');
+
+                if (account) {
+                    // Connected State
+                    btn.style.boxShadow = 'none';
+                    btn.style.borderColor = 'rgba(255,255,255,0.1)';
+                    btn.classList.remove('animate-pulse');
+
+                    label.innerText = 'Connected';
+
+                    // Mock Multi-Chain Balance Update
+                    state.wallet.balance = '145.22';
+                    if (balSol) balSol.innerText = (state.price * 1.5).toFixed(2); // Mock SOL holdings
+                    if (balUsdc) balUsdc.innerText = '5,420.00';
+                    if (balHl) balHl.innerText = '250.00';
+
+                } else {
+                    // Disconnected State
+                    label.innerText = 'CONNECT_WALLET';
+                    addrEl.innerText = 'Quantum_Access_Required';
+                    addrEl.classList.replace('text-hft-green', 'text-hft-cyan');
+
+                    // Pulsing Green Border Effect
+                    btn.style.boxShadow = '0 0 15px rgba(0, 255, 65, 0.3)';
+                    btn.style.borderColor = '#00FF41';
+                    btn.classList.add('animate-pulse');
+                }
+
+                addSystemLog(`WALLET_STATE: ${account ? 'CONNECTED' : 'DISCONNECTED'}`);
+            }
+
+            // Event Listeners for AppKit
+            appKit.subscribeEvents(({ event, data }) => {
+                console.log('AppKit Event:', event, data);
+                updateWalletState();
+            });
+
+            // Initial Check
+            setTimeout(updateWalletState, 1000); // Allow init time
+
+            // Bind Connect Button
+            document.getElementById('wallet-connect-btn').addEventListener('click', () => {
+                appKit.open();
+            });
+
+
+            const state = {
+                price: 145.228,
+                history: Array(100).fill(145.228),
+                rsi: 52.4,
+                momentum: 84,
+                sentimentScore: 68,
+                gainerPct: 0,
+                gainerSymbol: '---',
+                orderbook: { asks: [], bids: [] },
+                panelCollapsed: true,
+                chat: [],
+                wallet: {
+                    isConnected: false,
+                    address: null,
+                    balance: '0.00',
+                    network: null,
+                    provider: null
+                },
+                // Alerts
+                soundEnabled: true,
+                telegramConfig: null,
+                // HFT State
+                safeguardActive: true,
+                priorityGas: 1, // 1=STD, 2=TURBO, 3=MEV_BRIBE
+                pressureRatio: 50,
+                whaleEvents: [],
+                // Sniper Upgrade
+                sessionActive: false,
+                sessionExpiry: 0,
+                crtEnabled: true,
+                // Autonomous
+                autoPilot: { enabled: false, rsiThreshold: 30, maxLoss: 500, active: false },
+                ghostMode: false,
+                stealth: { rpc: null, jitoTip: 0 },
+                // Ecosystem & Security
+                myTrades: [],
+                lastTgUpdateId: 0,
+                rugCheck: { score: 100, status: 'SAFE' }
+            };
+
+            const canvas = document.getElementById('main-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Navigation Controller
+            window.switchView = function (view) {
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
+                const activeBtn = document.getElementById(`nav-${view}`);
+                if (activeBtn) activeBtn.classList.add('active-nav');
+
+                document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active-view'));
+                const activeView = document.getElementById(`view-${view}`);
+                if (activeView) activeView.classList.add('active-view');
+
+                if (view === 'dashboard') {
+                    setTimeout(drawChart, 10);
+                }
+            };
+
+            window.switchTab = function (t) {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                const tabBtn = document.getElementById(`tab-${t}`);
+                if (tabBtn) tabBtn.classList.add('active');
+
+                const contentTerminal = document.getElementById('content-terminal');
+                const contentOnchain = document.getElementById('content-onchain');
+                if (contentTerminal) contentTerminal.classList.toggle('hidden', t !== 'terminal');
+                if (contentOnchain) contentOnchain.classList.toggle('hidden', t !== 'onchain');
+            };
+
+            window.togglePanel = function () {
+                state.panelCollapsed = !state.panelCollapsed;
+                const panel = document.getElementById('bottom-intelligence-panel');
+                const chevron = document.getElementById('panel-chevron');
+                if (state.panelCollapsed) {
+                    panel.classList.replace('panel-expanded', 'panel-collapsed');
+                    chevron.classList.remove('rotate-180');
+                } else {
+                    panel.classList.replace('panel-collapsed', 'panel-expanded');
+                    chevron.classList.add('rotate-180');
+                }
+                setTimeout(drawChart, 450); // Redraw chart as layout shifts
+            };
+
+            function addSystemLog(msg) {
+                const logStream = document.getElementById('system-logs-stream');
+                if (!logStream) return;
+                const log = document.createElement('div');
+                log.innerHTML = `<span class="text-slate-600">[${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}]</span> ${msg}`;
+                logStream.appendChild(log);
+                logStream.scrollTop = logStream.scrollHeight;
+            }
+
+
+            // DEEPEYE V5 - RUST ZERO-LATENCY ENGINE
+            // Moved fetch logic to backend for sub-millisecond execution.
+
+            // Engine Loop
+            async function startEngine() {
+                // RUST EVENT LISTENER
+                try {
+                    await listen('price_update', (event) => {
+                        const { symbol, price } = event.payload;
+                        if (symbol === 'SOL') {
+                            // Smooth interpolation for UI
+                            const target = price;
+                            state.price = state.price * 0.9 + target * 0.1;
+                            if (Math.random() > 0.98) addSystemLog(`RUST_CORE: ${symbol} @ $${price.toFixed(3)} [0.1ms]`);
+                        }
+                    });
+                    addSystemLog('SYS: RUST_SOCKET_ATTACHED');
+                } catch (e) {
+                    console.error("Rust Event Error", e);
+                    addSystemLog('ERR: RUST_BRIDGE_FAIL - Reverting to Fallback');
+                }
+
+                // INIT
+                (async () => {
+                    addSystemLog('SYS: CORE_INITIATED');
+                    addSystemLog('SYS: CONNECTING_TO_SOLANA_MAINNET...');
+
+                    // Fetch Version
+                    try {
+                        const res = await fetch('/version.json');
+                        const data = await res.json();
+                        document.getElementById('app-version').innerText = `BUILD v${data.version}`;
+                        addSystemLog(`SYS: DEEPEYESNIPER_LOADED [v${data.version}]`);
+                    } catch (e) {
+                        document.getElementById('app-version').innerText = 'DEV_BUILD';
+                    }
+
+                    await initChart(); // Assuming initChart is defined elsewhere or will be added
+                    drawChart();
+                })();
+
+                setInterval(() => {
+                    // Micro-movements around the live price
+                    const delta = (Math.random() - 0.5) * 0.05;
+                    state.price += delta;
+                    state.history.shift();
+                    state.history.push(state.price);
+
+                    const currentPriceEl = document.getElementById('current-price');
+                    const priceBookEl = document.getElementById('price-book');
+
+                    if (currentPriceEl) currentPriceEl.innerText = `$${state.price.toFixed(3)}`;
+                    if (priceBookEl) priceBookEl.innerText = state.price.toFixed(3);
+
+                    state.rsi = Math.max(0, Math.min(100, state.rsi + (Math.random() - 0.5) * 2));
+
+                    // WHALE & PRESSURE LOGIC
+                    if (Math.random() > 0.05) { // 95% chance to drift pressure
+                        state.pressureRatio = Math.max(10, Math.min(90, state.pressureRatio + (Math.random() - 0.5) * 5));
+                        const buyPct = Math.floor(state.pressureRatio);
+                        const sellPct = 100 - buyPct;
+                        const pBuy = document.getElementById('pressure-buy');
+                        const pSell = document.getElementById('pressure-sell');
+                        const pText = document.getElementById('val-pressure-text');
+
+                        if (pBuy && pSell) {
+                            pBuy.style.width = `${buyPct}%`;
+                            pSell.style.width = `${sellPct}%`;
+                            pText.innerText = `B:${buyPct}% | S:${sellPct}%`;
+                        }
+                    }
+
+                    if (Math.random() > 0.95) { // 5% chance of Whale Event
+                        const isBuy = Math.random() > 0.5;
+                        const amount = 50000 + Math.random() * 200000;
+                        const price = state.price + (Math.random() - 0.5) * 0.5;
+
+                        const feed = document.getElementById('whale-feed');
+                        if (feed) {
+                            const item = document.createElement('div');
+                            item.className = 'flex justify-between items-center text-[9px] font-mono animate-in slide-in-from-right fade-in duration-300';
+                            item.innerHTML = `
+                            <span class="${isBuy ? 'text-hft-green' : 'text-hft-red'} font-bold">${isBuy ? 'BUY' : 'SELL'}</span>
+                            <span class="text-white">$${(amount / 1000).toFixed(1)}k</span>
+                            <span class="text-slate-500">${price.toFixed(2)}</span>
+                        `;
+                            feed.insertBefore(item, feed.firstChild);
+                            if (feed.children.length > 5) feed.lastChild.remove();
+
+                            // Whale Sound
+                            if (amount > 150000) playSound('PING');
+                        }
+                    }
+
+                    // GLOBAL ALERTS
+                    const body = document.body;
+                    if (state.rsi > 85) {
+                        body.classList.add('glow-dump');
+                        if (Math.random() > 0.9) playSound('SIREN');
+                    } else if (state.momentum > 90) {
+                        body.classList.add('glow-pump');
+                        body.classList.remove('glow-dump');
+                        if (Math.random() > 0.98) playSound('PING');
+                    } else {
+                        body.classList.remove('glow-pump', 'glow-dump');
+                    }
+
+                    // AUTO-PILOT LOGIC
+                    if (state.autoPilot.enabled) {
+                        const currentRSI = state.rsi;
+                        const rsiRule = parseInt(document.getElementById('strat-rsi').value || 30);
+
+                        if (currentRSI < rsiRule && !state.autoPilot.active) {
+                            // Trigger Buy
+                            state.autoPilot.active = true; // Prevent spam
+                            window.execute('BUY');
+                            addSystemLog(`AUTO_PILOT: RSI ${currentRSI.toFixed(1)} < ${rsiRule} -> EXECUTING`);
+
+                            // Reset active flag after cooldown
+                            setTimeout(() => { state.autoPilot.active = false; }, 5000);
+                        }
+                    }
+
+                    const rsiEl = document.getElementById('val-rsi');
+                    if (rsiEl) rsiEl.innerText = state.rsi.toFixed(1);
+
+                    state.momentum = Math.max(0, Math.min(100, state.momentum + (Math.random() - 0.5) * 5));
+                    const momEl = document.getElementById('val-mom');
+                    const momBar = document.getElementById('mom-bar');
+                    if (momEl) momEl.innerText = Math.round(state.momentum) + '%';
+                    if (momBar) momBar.style.width = Math.round(state.momentum) + '%';
+
+                    const momPulseSpeed = 2 - (state.momentum / 100) * 1.8;
+                    document.documentElement.style.setProperty('--mom-pulse-speed', `${momPulseSpeed}s`);
+
+                    state.sentimentScore = Math.max(0, Math.min(100, state.sentimentScore + (state.momentum - 50) * 0.05 + (Math.random() - 0.5)));
+                    const sentScoreEl = document.getElementById('val-sentiment-score');
+                    const sentLabelEl = document.getElementById('val-sentiment');
+                    if (sentScoreEl) sentScoreEl.innerText = Math.round(state.sentimentScore);
+
+                    let label = 'NEUTRAL';
+                    if (state.sentimentScore > 80) label = 'EX_GREED';
+                    else if (state.sentimentScore > 60) label = 'GREED';
+                    else if (state.sentimentScore < 20) label = 'EX_FEAR';
+                    else if (state.sentimentScore < 40) label = 'FEAR';
+                    if (sentLabelEl) sentLabelEl.innerText = label;
+
+                    const clusterEl = document.getElementById('val-vol-cluster');
+                    if (clusterEl) clusterEl.innerText = state.momentum > 70 ? 'EXTREME' : (state.momentum > 40 ? 'HIGH' : 'LOW');
+
+                }, 150);
+
+                // Orderbook Simulation
+                setInterval(() => {
+                    const spread = 0.005;
+                    const asks = Array.from({ length: 12 }, (_, i) => ({
+                        px: (state.price + spread * (i + 1)).toFixed(3),
+                        sz: (Math.random() * 500 + 10).toFixed(1)
+                    })).reverse();
+                    const bids = Array.from({ length: 12 }, (_, i) => ({
+                        px: (state.price - spread * (i + 1)).toFixed(3),
+                        sz: (Math.random() * 500 + 10).toFixed(1)
+                    }));
+
+                    const asksStreamEl = document.getElementById('asks-stream');
+                    const bidsStreamEl = document.getElementById('bids-stream');
+                    if (asksStreamEl) asksStreamEl.innerHTML = asks.map(a => `<div class="flex justify-between px-2 py-0.5 group"><span class="text-hft-red font-bold group-hover:bg-hft-red/20 transition-all px-1 rounded fluid-sub">${a.px}</span><span class="text-slate-500 fluid-sub">${a.sz}</span></div>`).join('');
+                    if (bidsStreamEl) bidsStreamEl.innerHTML = bids.map(b => `<div class="flex justify-between px-2 py-0.5 group"><span class="text-hft-green font-bold group-hover:bg-hft-green/20 transition-all px-1 rounded fluid-sub">${b.px}</span><span class="text-slate-500 fluid-sub">${b.sz}</span></div>`).join('');
+                }, 400);
+
+                // Gainer Scan
+                setInterval(() => {
+                    const tokens = ['PEPE', 'SOL', 'WIF', 'BONK', 'JUP', 'PYTH', 'POPCAT', 'MOODENG', 'PNUT'];
+                    const listEl = document.getElementById('gainer-list');
+                    if (listEl) {
+                        const g = Array.from({ length: 5 }, () => ({
+                            t: tokens[Math.floor(Math.random() * tokens.length)],
+                            p: (Math.random() * 300 + 5).toFixed(2)
+                        })).sort((a, b) => b.p - a.p);
+
+                        listEl.innerHTML = g.map(x => `<div class="p-3 bg-white/5 border border-white/5 rounded-xl flex justify-between items-center mb-1"><span class="text-white font-bold fluid-sub">${x.t}</span><span class="text-hft-green font-bold fluid-sub">+${x.p}%</span></div>`).join('');
+
+                        const topToken = g[0];
+                        state.gainerPct = parseFloat(topToken.p);
+                        state.gainerSymbol = topToken.t;
+
+                        const gPctEl = document.getElementById('val-gainer-pct');
+                        const gSymEl = document.getElementById('val-gainer-symbol');
+                        const gCircleEl = document.getElementById('circle-gainer');
+
+                        if (gPctEl) gPctEl.innerText = `+${state.gainerPct.toFixed(1)}%`;
+                        if (gSymEl) gSymEl.innerText = `${state.gainerSymbol}/USDC`;
+                        if (gCircleEl) {
+                            const totalCircumference = 213.6;
+                            const normalizedPct = Math.min(100, (state.gainerPct / 400) * 100);
+                            const offset = totalCircumference - (normalizedPct / 100) * totalCircumference;
+                            gCircleEl.style.strokeDashoffset = offset;
+                        }
+                    }
+                }, 2000);
+
+                // Alpha Radar Loop
+                setInterval(() => {
+                    if (Math.random() > 0.8) {
+                        const pairs = ['PEPE/SOL', 'WIF/SOL', 'BONK/USDC', 'AI16Z/SOL', 'TRUMP/USDC'];
+                        const pair = pairs[Math.floor(Math.random() * pairs.length)];
+                        const vol = (Math.random() * 5 + 0.5).toFixed(1);
+                        const isHot = vol > 3;
+
+                        const ticker = document.getElementById('alpha-ticker');
+                        if (ticker) {
+                            ticker.innerHTML = `<span class="text-white font-bold">NEW_PAIR: <span class="${isHot ? 'text-hft-red animate-pulse' : 'text-hft-green'}">${pair}</span> VOL: $${vol}M</span> <span class="text-slate-600">|</span> <span>SCANNING_DEX...</span>`;
+
+                            if (isHot && state.soundEnabled) {
+                                // Subtle alert for alpha
+                                addSystemLog(`ALPHA_ALARM: ${pair} VOL SPIKE > $${vol}M`);
+                            }
+                        }
+                    }
+                }, 3000);
+
+                // Ecosystem Loops
+                setInterval(pollTelegram, 3000);
+                setInterval(checkContractSafeguard, 10000);
+            }
+
+            function drawChart() {
+                if (!canvas) return;
+                const dpr = window.devicePixelRatio || 1;
+                const container = canvas.parentElement;
+                if (!container) return;
+                const rect = container.getBoundingClientRect();
+
+                if (canvas.width !== Math.floor(rect.width * dpr) || canvas.height !== Math.floor(rect.height * dpr)) {
+                    canvas.width = Math.floor(rect.width * dpr);
+                    canvas.height = Math.floor(rect.height * dpr);
+                }
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, rect.width, rect.height);
+
+                const min = Math.min(...state.history) - 0.1;
+                const max = Math.max(...state.history) + 0.1;
+                const range = max - min;
+                const padding = 20;
+                const chartW = rect.width;
+                const chartH = rect.height;
+                const step = chartW / (state.history.length - 1);
+
+                ctx.beginPath();
+                ctx.moveTo(0, chartH);
+                state.history.forEach((p, i) => {
+                    const x = i * step;
+                    const y = chartH - padding - ((p - min) / range) * (chartH - padding * 2);
+                    ctx.lineTo(x, y);
+                });
+                ctx.lineTo(chartW, chartH);
+                const grad = ctx.createLinearGradient(0, 0, 0, chartH);
+                grad.addColorStop(0, 'rgba(0, 209, 255, 0.15)');
+                grad.addColorStop(1, 'rgba(0, 209, 255, 0)');
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.strokeStyle = '#00D1FF';
+                ctx.lineWidth = 2;
+                ctx.lineJoin = 'round';
+                state.history.forEach((p, i) => {
+                    const x = i * step;
+                    const y = chartH - padding - ((p - min) / range) * (chartH - padding * 2);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+
+                // TRADE MARKERS
+                state.myTrades.forEach(t => {
+                    // Map time to X (simple assumption: recent trades are near end)
+                    // Ideally we timestamp data points, but for this demo loops:
+                    // We'll just draw them relative to current price for visual effect
+                    // In prod, map t.time to x coordinate
+
+                    const x = chartW - 20 - (Math.random() * 50); // Sim marker position
+                    const y = chartH - padding - ((t.price - min) / range) * (chartH - padding * 2);
+
+                    ctx.beginPath();
+                    ctx.fillStyle = t.side === 'BUY' ? '#00FF41' : '#FF003C';
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.font = '8px monospace';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(t.side === 'BUY' ? 'B' : 'S', x - 2, y - 5);
+                });
+
+                requestAnimationFrame(drawChart);
+            }
+
+            async function queryAI(isFullView = true) {
+                const inputId = isFullView ? 'ai-input' : 'panel-ai-input';
+                const streamId = isFullView ? 'chat-stream' : 'panel-chat-stream';
+
+                const input = document.getElementById(inputId);
+                const stream = document.getElementById(streamId);
+                const prompt = input.value.trim();
+                if (!prompt) return;
+
+                // User UI
+                const userMsg = document.createElement('div');
+                userMsg.className = 'text-white font-bold opacity-80';
+                userMsg.innerText = `> ${prompt}`;
+                stream.appendChild(userMsg);
+                input.value = '';
+                stream.scrollTop = stream.scrollHeight;
+
+                try {
+                    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+                    const response = await ai.models.generateContent({
+                        model: 'gemini-3-pro-preview',
+                        contents: prompt,
+                        config: {
+                            systemInstruction: "You are DEEPEYE V5 ULTRA Intelligence Core. Provide extremely concise expert analysis (max 2 sentences).",
+                            thinkingConfig: { thinkingBudget: 1000 }
+                        }
+                    });
+
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'text-hft-cyan';
+                    aiMsg.innerText = response.text;
+                    stream.appendChild(aiMsg);
+                    stream.scrollTop = stream.scrollHeight;
+                    addSystemLog(`AI_QUERY_SUCCESS: "${prompt.slice(0, 10)}..."`);
+                } catch (err) {
+                    console.error(err);
+                    addSystemLog(`AI_QUERY_ERR: Communications interrupted`);
+                }
+            }
+
+            // SOUND ENGINE
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            function playSound(type) {
+                if (!state.soundEnabled) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'PING') {
+                    // Price jump: High pitch sine
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'SIREN') {
+                    // Warning: Sawtooth
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+                    osc.frequency.linearRampToValueAtTime(400, now + 0.4);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 1);
+                    osc.start(now);
+                    osc.stop(now + 1);
+                } else if (type === 'EXEC') {
+                    // Success: Triangle
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            }
+
+            async function sendTelegramAlert(msg) {
+                const token = document.getElementById('tg-token').value;
+                const chat = document.getElementById('tg-chat').value;
+                if (!token || !chat) return;
+
+                try {
+                    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: chat, text: msg, parse_mode: 'Markdown' })
+                    });
+                    addSystemLog('TG_ALERT_SENT');
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            // TELEGRAM POLLING (Simulated)
+            async function pollTelegram() {
+                const token = document.getElementById('tg-token').value;
+                if (!token) return;
+
+                // In prod: fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${state.lastTgUpdateId+1}`)
+                // For demo: Mock incoming commands occasionally
+
+                if (Math.random() > 0.995 && state.safeguardActive) {
+                    const cmds = ['/status', '/panic_sell'];
+                    const cmd = cmds[Math.floor(Math.random() * cmds.length)];
+                    addSystemLog(`TG_CMD_RECV: ${cmd}`);
+
+                    if (cmd === '/status') {
+                        sendTelegramAlert(`*STATUS REPORT*\nPrice: $${state.price.toFixed(3)}\nBal: ${state.wallet.balance} SOL`);
+                    } else if (cmd === '/panic_sell') {
+                        addSystemLog('TG_FORCE_EXEC: PANIC_SELL');
+                        window.execute('SELL');
+                    }
+                }
+            }
+
+            // ANTI-RUG (Simulated)
+            async function checkContractSafeguard() {
+                // Mock API call to RugCheck.xyz
+                // In prod: fetch(`https://api.rugcheck.xyz/v1/tokens/${tokenAddress}`)
+                const score = 40 + Math.floor(Math.random() * 60); // 40-100
+                state.rugCheck.score = score;
+                state.rugCheck.status = score > 80 ? 'SAFE' : (score > 50 ? 'WARN' : 'RISK');
+
+                const el = document.getElementById('val-trust-score');
+                if (el) {
+                    el.innerText = `${score}/100`;
+                    el.className = `text-[9px] font-bold leading-none ${score > 80 ? 'text-hft-green' : (score > 50 ? 'text-hft-orange' : 'text-hft-red animate-pulse')}`;
+                }
+            }
+
+            window.toggleSettings = function () {
+                const el = document.getElementById('settings-modal');
+                el.classList.toggle('hidden');
+            }
+
+            window.toggleSound = function () {
+                state.soundEnabled = !state.soundEnabled;
+                const btn = document.getElementById('btn-sound');
+                if (state.soundEnabled) {
+                    btn.innerText = 'ENABLED';
+                    btn.className = 'cursor-pointer px-3 py-1 rounded bg-hft-green/20 text-hft-green text-[9px] font-bold border border-hft-green/30';
+                } else {
+                    btn.innerText = 'MUTED';
+                    btn.className = 'cursor-pointer px-3 py-1 rounded bg-hft-red/20 text-hft-red text-[9px] font-bold border border-hft-red/30';
+                }
+            }
+
+            window.toggleCRT = function () {
+                state.crtEnabled = !state.crtEnabled;
+                const layer = document.getElementById('crt-layer');
+                const btn = document.getElementById('btn-crt');
+
+                if (state.crtEnabled) {
+                    layer.classList.add('crt-active');
+                    btn.innerText = 'ENABLED';
+                    btn.className = 'cursor-pointer px-3 py-1 rounded bg-hft-green/20 text-hft-green text-[9px] font-bold border border-hft-green/30';
+                } else {
+                    layer.classList.remove('crt-active');
+                    btn.innerText = 'DISABLED';
+                    btn.className = 'cursor-pointer px-3 py-1 rounded bg-hft-red/20 text-hft-red text-[9px] font-bold border border-hft-red/30';
+                }
+            }
+
+            window.toggleSession = function () {
+                state.sessionActive = !state.sessionActive;
+                const btn = document.getElementById('btn-session');
+
+                if (state.sessionActive) {
+                    state.sessionExpiry = Date.now() + 3600000; // 1 Hour
+                    btn.innerText = 'ACTIVE (59m)';
+                    btn.className = 'cursor-pointer px-3 py-1 rounded bg-hft-green/20 text-hft-green text-[9px] font-bold border border-hft-green/30';
+                    addSystemLog('SEC: SESSION_KEY_GENERATED [1H]');
+                } else {
+                    state.sessionExpiry = 0;
+                    btn.innerText = 'DISABLED';
+                    btn.className = 'cursor-pointer px-3 py-1 rounded bg-hft-red/20 text-hft-red text-[9px] font-bold border border-hft-red/30';
+                    addSystemLog('SEC: SESSION_KEY_REVOKED');
+                }
+            }
+
+            window.toggleStrategy = function () {
+                const el = document.getElementById('strategy-modal');
+                el.classList.toggle('hidden');
+            }
+
+            window.toggleAutoPilot = function () {
+                state.autoPilot.enabled = !state.autoPilot.enabled;
+                const btn = document.getElementById('btn-autopilot');
+                if (state.autoPilot.enabled) {
+                    btn.innerText = 'ENGAGED';
+                    btn.className = 'px-4 py-2 rounded bg-hft-indigo text-black text-[9px] font-bold border border-hft-indigo tracking-widest transition-all animate-pulse';
+                    addSystemLog('SYS: AUTO_PILOT_ENGAGED [RSI_HUNT]');
+                } else {
+                    btn.innerText = 'DISENGAGED';
+                    btn.className = 'px-4 py-2 rounded bg-hft-red/20 text-hft-red text-[9px] font-bold border border-hft-red/30 tracking-widest transition-all';
+                    addSystemLog('SYS: AUTO_PILOT_STANDBY');
+                }
+            }
+
+            window.toggleGhost = function () {
+                state.ghostMode = !state.ghostMode;
+                if (state.ghostMode) {
+                    document.body.classList.add('ghost-mode');
+                    addSystemLog('SEC: GHOST_MODE_ACTIVE');
+                } else {
+                    document.body.classList.remove('ghost-mode');
+                    addSystemLog('SEC: GHOST_MODE_DISABLED');
+                }
+            }
+
+            // Keyboard Shortcuts
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'g') {
+                    e.preventDefault();
+                    toggleGhost();
+                }
+            });
+
+            window.updateGas = function (val) {
+                state.priorityGas = parseInt(val);
+                const label = document.getElementById('gas-label');
+                const map = { 1: 'STD', 2: 'TURBO', 3: 'MEV' };
+                const colors = { 1: 'text-hft-cyan', 2: 'text-hft-orange', 3: 'text-hft-red' };
+
+                label.innerText = map[val];
+                label.className = `text-[8px] font-mono font-bold ${colors[val]}`;
+
+                // Haptic/Sound placeholder
+                if (val == 3) addSystemLog('WARN: MEV_BRIBE_ACTIVE - COST HIGH');
+            }
+
+            window.toggleSafeguard = function () {
+                state.safeguardActive = !state.safeguardActive;
+                const toggle = document.getElementById('safeguard-toggle');
+                const knob = document.getElementById('safeguard-knob');
+                const label = document.getElementById('safeguard-label');
+                const btns = [document.getElementById('btn-panic-buy'), document.getElementById('btn-panic-short')];
+
+                if (state.safeguardActive) {
+                    // SAFE
+                    toggle.className = "w-8 h-4 bg-hft-green rounded-full relative transition-colors shadow-[0_0_10px_rgba(0,255,65,0.2)]";
+                    knob.style.transform = "translateX(0)";
+                    label.innerText = "SAFE_MODE_ON";
+                    label.className = "text-[8px] font-bold text-hft-green uppercase tracking-widest transition-colors";
+
+                    // Reset buttons
+                    btns.forEach(b => {
+                        b.classList.remove('animate-pulse', 'border', 'border-red-500');
+                        b.innerText = b.id.includes('buy') ? 'BUY' : 'SELL';
+                    });
+
+                    addSystemLog('SYS: SAFEGUARD_ENGAGED');
+                } else {
+                    // NAKED (DANGER)
+                    toggle.className = "w-8 h-4 bg-hft-red rounded-full relative transition-colors shadow-[0_0_15px_rgba(255,94,142,0.4)]";
+                    knob.style.transform = "translateX(16px)";
+                    label.innerText = "NAKED_MODE";
+                    label.className = "text-[8px] font-bold text-hft-red uppercase tracking-widest transition-colors animate-pulse";
+
+                    // Danger buttons
+                    btns.forEach(b => {
+                        b.innerText = b.id.includes('buy') ? 'APE NOW' : 'DUMP NOW';
+                    });
+
+                    addSystemLog('WARN: SAFEGUARD_DISENGAGED - 1-CLICK ACTIVE');
+                }
+            }
+
+            window.execute = async function (side) {
+                if (!state.wallet.isConnected) {
+                    appKit.open();
+                    addSystemLog('ERR: WALLET_DISCONNECTED - Auth Required');
+                    return;
+                }
+
+                // STEALTH CHECK
+                const jitoTip = document.getElementById('jito-tip').value;
+                if (jitoTip && parseFloat(jitoTip) > 0) {
+                    addSystemLog(`STEALTH: BUNDLE_SENT [Tip: ${jitoTip} SOL]`);
+                }
+
+                if (state.safeguardActive && state.rugCheck.score < 50 && side === 'BUY') {
+                    addSystemLog('ERR: RUG_CHECK_FAIL (Score < 50) - EXECUTION BLOCKED');
+                    playSound('SIREN');
+                    return;
+                }
+
+                if (!state.safeguardActive) {
+                    const gasMap = { 1: 'STD', 2: 'TURBO', 3: 'MEV_BRIBE' };
+                    addSystemLog(`⚡ HFT_EXEC_SENT: ${side} | GAS: ${gasMap[state.priorityGas]}`);
+
+                    // Trade Marker Logic
+                    state.myTrades.push({ side, price: state.price, time: state.history.length - 1 });
+                    if (state.myTrades.length > 20) state.myTrades.shift(); // Keep history clean
+
+                    // PnL Popup
+                    if (side === 'SELL') {
+                        const fee = 0.001;
+                        const lastBuy = state.myTrades.filter(t => t.side === 'BUY').pop();
+                        if (lastBuy) {
+                            const pnl = (state.price - lastBuy.price) - fee;
+                            addSystemLog(`PnL: ${pnl > 0 ? '+' : ''}${pnl.toFixed(4)} SOL`);
+                        }
+                    }
+
+                    // Simulate ultra-low latency confirmation
+                    setTimeout(() => {
+                        addSystemLog(`CONFIRMED: TX_HASH_0x${Math.random().toString(16).substr(2, 8)}... [0.4ms]`);
+                        // Visual feedback
+                        const btn = document.getElementById(`btn-panic-${side === 'BUY' ? 'buy' : 'short'}`);
+                        btn.classList.add('brightness-150');
+                        setTimeout(() => btn.classList.remove('brightness-150'), 150);
+                    }, 200); // 200ms sim delay
+                    return;
+                }
+
+                // SESSION KEY BYPASS
+                if (state.sessionActive && Date.now() < state.sessionExpiry) {
+                    addSystemLog(`SESSION_EXEC: ${side} @ ${state.price.toFixed(3)} [AUTO_SIGN]`);
+                    playSound('EXEC');
+                    sendTelegramAlert(`🔑 *SESSION TRADE* \nSide: ${side}\nPrice: ${state.price.toFixed(3)}`);
+
+                    // Visual feedback for Auto-Sign
+                    const btn = document.getElementById(`btn-panic-${side === 'BUY' ? 'buy' : 'short'}`);
+                    btn.classList.add('brightness-150');
+                    setTimeout(() => btn.classList.remove('brightness-150'), 150);
+                    return;
+                }
+
+                // STANDARD SAFE PATH
+                addSystemLog(`ORDER_BROADCAST: ${side} @ ${state.price.toFixed(3)} [SIG_REQ]`);
+
+                try {
+                    // EVM Signature logic (Wagmi)
+                    const message = `DeepEye Execution:\nSide: ${side}\nPrice: ${state.price.toFixed(3)}\nTime: ${Date.now()}`;
+
+                    // Check if EVM (Wagmi config available)
+                    if (wagmiAdapter.wagmiConfig) {
+                        await signMessage(wagmiAdapter.wagmiConfig, { message });
+                        addSystemLog(`SIG_VERIFIED: ${side} EXECUTION CONFIRMED`);
+                    } else {
+                        addSystemLog(`SIG_SKIPPED: Non-EVM Provider`);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    addSystemLog(`SIG_FAILED: User Rejected`);
+                }
+
+                const btn = document.getElementById(`btn-panic-${side === 'BUY' ? 'buy' : 'short'}`);
+                if (btn) {
+                    btn.classList.add('scale-95', 'opacity-50');
+                    setTimeout(() => btn.classList.remove('scale-95', 'opacity-50'), 100);
+                }
+            };
+
+            // Event Listeners
+            document.getElementById('ai-send').addEventListener('click', () => queryAI(true));
+            document.getElementById('ai-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') queryAI(true); });
+
+            document.getElementById('panel-ai-send').addEventListener('click', () => queryAI(false));
+            document.getElementById('panel-ai-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') queryAI(false); });
+
+            window.addEventListener('resize', drawChart);
+            window.onload = () => {
+                startEngine();
+                drawChart();
+                addSystemLog('KERNEL_BOOT_COMPLETE');
+            };
+        </script>
+        <script type="module" src="/index.tsx"></script>
+    </body>
+
+</html>

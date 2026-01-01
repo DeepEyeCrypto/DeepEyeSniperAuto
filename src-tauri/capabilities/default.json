@@ -1,0 +1,41 @@
+{
+    "$schema": "../gen/schemas/desktop-schema.json",
+    "identifier": "default",
+    "description": "Default capabilities for DeepEye V5",
+    "windows": [
+        "main"
+    ],
+    "permissions": [
+        "core:default",
+        "http:default",
+        "websocket:default",
+        {
+            "identifier": "http:default",
+            "allow": [
+                {
+                    "url": "https://api.hyperliquid.xyz/*"
+                },
+                {
+                    "url": "https://api.jup.ag/*"
+                },
+                {
+                    "url": "https://*.reown.com/*"
+                }
+            ]
+        },
+        {
+            "identifier": "websocket:default",
+            "allow": [
+                {
+                    "url": "wss://api.hyperliquid.xyz/ws"
+                },
+                {
+                    "url": "wss://*.reown.com/*"
+                },
+                {
+                    "url": "wss://*.walletconnect.com/*"
+                }
+            ]
+        }
+    ]
+}
