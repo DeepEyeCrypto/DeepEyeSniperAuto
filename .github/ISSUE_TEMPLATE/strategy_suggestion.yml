@@ -1,0 +1,21 @@
+name: 📈 Strategy Suggestion
+description: Propose a new trading strategy or rule engine logic
+labels: ["strategy", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Our Auto-Pilot engine is built on community ideas. Tell us what rules we should add next!
+  - type: textarea
+    id: strategy-logic
+    attributes:
+      label: Strategy Logic
+      description: Describe the RSI, Volume, or Momentum triggers you are thinking of.
+      placeholder: e.g. "If RSI < 25 AND Volume > 1.5x average on 1m chart..."
+    validations:
+      required: true
+  - type: input
+    id: target-dex
+    attributes:
+      label: Target DEX/Chain
+      description: Which chain or DEX should this strategy target? (e.g. SOL, Hyperliquid, Base)
